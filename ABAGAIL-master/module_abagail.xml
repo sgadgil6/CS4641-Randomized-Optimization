@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_abagail" default="compile.module.abagail">
+  <dirname property="module.abagail.basedir" file="${ant.file.module_abagail}"/>
+  
+  <property name="module.jdk.home.abagail" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.abagail" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.abagail" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.abagail" value="-encoding UTF-8 -source 1.8 -target 1.8 ${compiler.args}"/>
+  
+  <property name="abagail.output.dir" value="${module.abagail.basedir}/bin"/>
+  <property name="abagail.testoutput.dir" value="${module.abagail.basedir}/bin"/>
+  
+  <path id="abagail.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="abagail.module.production.classpath">
+    <path refid="${module.jdk.classpath.abagail}"/>
+  </path>
+  
+  <path id="abagail.runtime.production.module.classpath">
+    <pathelement location="${abagail.output.dir}"/>
+  </path>
+  
+  <path id="abagail.module.classpath">
+    <pathelement location="${abagail.output.dir}"/>
+    <path refid="${module.jdk.classpath.abagail}"/>
+  </path>
+  
+  <path id="abagail.runtime.module.classpath">
+    <pathelement location="${abagail.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.abagail">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.abagail">
+    <patternset refid="excluded.from.module.abagail"/>
+  </patternset>
+  
+  <path id="abagail.module.sourcepath">
+    <dirset dir="${module.abagail.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.abagail" depends="compile.module.abagail.production,compile.module.abagail.tests" description="Compile module ABAGAIL"/>
+  
+  <target name="compile.module.abagail.production" depends="register.custom.compilers" description="Compile module ABAGAIL; production classes">
+    <mkdir dir="${abagail.output.dir}"/>
+    <javac2 destdir="${abagail.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.abagail}/javac">
+      <compilerarg line="${compiler.args.abagail}"/>
+      <bootclasspath refid="abagail.module.bootclasspath"/>
+      <classpath refid="abagail.module.production.classpath"/>
+      <src refid="abagail.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.abagail"/>
+    </javac2>
+    
+    <copy todir="${abagail.output.dir}">
+      <fileset dir="${module.abagail.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.abagail.tests" depends="register.custom.compilers,compile.module.abagail.production" description="compile module ABAGAIL; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.abagail" description="cleanup module">
+    <delete dir="${abagail.output.dir}"/>
+    <delete dir="${abagail.testoutput.dir}"/>
+  </target>
+</project>
